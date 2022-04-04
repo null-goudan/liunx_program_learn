@@ -20,5 +20,6 @@ int main(int argc, char* argv[]){
     // send a address
     sigv.sival_ptr = func;
     sigqueue(pid, sig, sigv); 
+    sleep(20);
     return 0;
 }
