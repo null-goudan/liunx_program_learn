@@ -24,7 +24,7 @@ int main(){
     printf("get the key of ipc success!\n");
     // create the shared memory 4k per page
     int shmid = shmget(key, 1024, IPC_CREAT|0644);
-    if(-1 == shmid) printf("create the shared memory failed: %m\n");
+    if(-1 == shmid) printf("create the shared memory failed: %m\n"), exit(-1);
     printf("create the shared memory success!\n");
     // share memory mounting
     p = (int *)shmat(shmid, NULL, 0);
