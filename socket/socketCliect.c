@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include <signal.h>
 
-int serverSocket, clientSocket;
+int clientSocket;
 
 // struct sockaddr_in {
 //     short int sin_family; /* 地址族，AF_xxx 在socket编程中只能是AF_INET */
@@ -20,7 +20,6 @@ int serverSocket, clientSocket;
 
 void exit_handler(){
     close(clientSocket);
-    close(serverSocket);
     printf("bye!\n");
     exit(0);
 }
@@ -33,45 +32,29 @@ int main(int argc, char* argv[]){
     // signal exit()
     signal(2, exit_handler);
     // create socket
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if(-1 == serverSocket) printf("don't get serverSocket_Id!%m\n"),exit(-1);
-    printf("Get the serverSocket!\n");
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if(-1 == clientSocket) printf("don't get clientSocket!%m\n"),exit(-1);
+    printf("Get the clientSocket!\n");
 
-    // create server protrol address family
+    // get server protrol address family
     struct sockaddr_in add;
     add.sin_family = AF_INET;
     add.sin_addr.s_addr = inet_addr(argv[1]);
     add.sin_port = atoi(argv[2]);
 
-    // bind
-    int r = bind(serverSocket, (struct sockaddr_in *)&add,sizeof(add));
-    if(-1==r) printf("bind failed!%m\n"),exit(-1);
-    printf("bind successful!\n");
 
-    // listen
-    r = listen(serverSocket, 10);
-    if(-1==r) printf("listen failed!%m\n"),exit(-1);
-    printf("listen successful!\n");
-
-    struct sockaddr_in add_cliect = {0};
-    int len_cliect = sizeof(add_cliect);
-
-    // accept client connect
-    clientSocket = accept(serverSocket,(struct sockaddr_in *)&add_cliect, &len_cliect);
+    // client connect
+    clientSocket = connect(clientSocket, (struct sockaddr_in *)&add, sizeof(add));
     if(-1==clientSocket) printf("server failed!%m\n"),exit(-1);
-    printf("Cliect connect!\nClient %s\n", inet_ntoa(add_cliect.sin_addr));
+    printf("Connect!");
 
     //get msg
     char buffer[1024];
     while(1){
-        int r = recv(clientSocket, buffer, 1024, 0);
-        if(r>0){
-            buffer[r] = 0;
-            printf(">> %s\n", buffer);
-        }
+        scanf("%s", buffer);
+        send(clientSocket, buffer, sizeof(buffer), 0);
     }
     close(clientSocket);
-    close(serverSocket);
     printf("bye!\n");
     return 0;
 }
