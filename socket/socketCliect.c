@@ -44,15 +44,16 @@ int main(int argc, char* argv[]){
 
 
     // client connect
-    clientSocket = connect(clientSocket, (struct sockaddr_in *)&add, sizeof(add));
-    if(-1==clientSocket) printf("server failed!%m\n"),exit(-1);
+    int r = connect(clientSocket, (struct sockaddr_in *)&add, sizeof(add));
+    if(-1==r) printf("server failed!%m\n"),exit(-1);
     printf("Connect!");
 
     //get msg
-    char buffer[1024];
+    char buffer[256];
     while(1){
         scanf("%s", buffer);
-        send(clientSocket, buffer, sizeof(buffer), 0);
+        int s = send(clientSocket, buffer, sizeof(buffer), 0);
+        if(s == -1) printf("%m");
     }
     close(clientSocket);
     printf("bye!\n");

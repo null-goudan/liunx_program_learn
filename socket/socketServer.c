@@ -57,14 +57,14 @@ int main(int argc, char* argv[]){
     int len_cliect = sizeof(add_cliect);
 
     // accept client connect
-    clientSocket = accept(serverSocket,(struct sockaddr_in *)&add_cliect, &len_cliect);
+    clientSocket = accept(serverSocket,(struct sockaddr_in *)&add_cliect, (struct socklen_t*)&len_cliect);
     if(-1==clientSocket) printf("server failed!%m\n"),exit(-1);
     printf("Cliect connect!\nClient %s\n", inet_ntoa(add_cliect.sin_addr));
 
     //get msg
-    char buffer[1024];
+    char buffer[256];
     while(1){
-        int r = recv(clientSocket, buffer, 1024, 0);
+        int r = recv(clientSocket, buffer, 255, 0);
         if(r>0){
             buffer[r] = 0;
             printf(">> %s\n", buffer);
