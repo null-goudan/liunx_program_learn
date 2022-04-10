@@ -88,9 +88,29 @@ int main(int argc, char *argv[])
                     printf("Have something wrong with server %m\n");
                     continue;
                 }
-                printf("Cliect connected! id ---> %d\n", cfd);
+                pfds[num_of_fds].fd = cfd;
+                pfds[num_of_fds].events = POLLIN;
+                num_of_fds++;
+                printf("now cliect list: \n");
+                for(int i =0;i<num_of_fds;i++){
+                    if(pfds[i].fd != -1){
+                        printf("id: %d\n", pfds[i].fd);
+                    }
+                }
+                printf("Cliect connected! id ---> %d -> ", cfd);
                 printf("Cliect ip address: %s\n", inet_ntoa(add_cliect.sin_addr));
-                
+            }
+            for(int i = 1;i<=num_of_fds; i++){
+                if(POLLIN && pfds[i].revents){
+                    int r= recv(pfds[i].fd, buffer, 255, 0);
+                    if(r>0){
+                        printf("cliect_id: %d: %s\n", pfds[i].fd, buffer);
+                    }else{
+                        printf("cliect leave: id--->%d", pfds[i].fd);
+                        pfds[i].fd = -1;
+                        num_of_fds--;
+                    }
+                }
             }
         }
         
