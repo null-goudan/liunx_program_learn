@@ -1,0 +1,68 @@
+#include <aio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#define BUFF_SIZE 4096
+#define ARRAY_SIZE 2
+
+        //     #include <aiocb.h>
+        //     struct aiocb {
+        //        /* The order of these fields is implementation-dependent */
+
+        //        int             aio_fildes;     /* File descriptor */
+        //        off_t           aio_offset;     /* File offset */
+        //        volatile void  *aio_buf;        /* Location of buffer */
+        //        size_t          aio_nbytes;     /* Length of transfer */
+        //        int             aio_reqprio;    /* Request priority */
+        //        struct sigevent aio_sigevent;   /* Notification method */
+        //        int             aio_lio_opcode; /* Operation to be performed;
+        //                                           lio_listio() only */
+
+        //        /* Various implementation-internal fields not shown */
+        //    };
+
+        //    /* Operation codes for 'aio_lio_opcode': */
+
+int main(){
+    // prepare buffer
+    struct aiocb aio = {0};
+    int fd = open("test.txt", O_RDONLY);
+    if(-1 == fd) printf("can't open file %m");
+    aio.aio_buf = malloc(BUFF_SIZE + 1);
+    aio.aio_fildes = fd;
+    aio.aio_nbytes = BUFF_SIZE;
+    // create the ptr of struct aiocb array
+    struct aiocb* aiocb_list[ARRAY_SIZE] = {0};
+    // operator of asyncIO : aio_read, aio_write, aio_error
+    int r = aio_read(&aio);
+    if(-1 == r){
+        printf("async read failed! %m\n");
+        close(fd);
+        free(aio.aio_buf);
+        exit(-1);
+    }
+    // use aio_suspend to wait(block) the data read finish
+    int num_of_list = 0;
+    aiocb_list[num_of_list] = &aio;
+    num_of_list++;
+    r = aio_suspend(aiocb_list, ARRAY_SIZE, NULL);
+    if(r==-1){
+        printf("suspend failed! %m\n");
+        close(fd);
+        free(aio.aio_buf);
+        exit(-1);
+    }
+    printf("suspend successfully!\n");
+    // get the data of async
+    r = aio_return(&aio);
+    if(r>0){
+        printf("Get: r: %d, data: %s", r, aio.aio_buf);
+    }
+    // the end
+    free(aio.aio_buf);
+    close(fd);
+    return 0;
+}
+
