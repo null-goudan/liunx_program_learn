@@ -18,7 +18,7 @@ void func2(void *arg){
     for(int i=0;i<10;i++){
         pthread_mutex_lock(&mutelock);
         pthread_cond_wait(&cond, &mutelock);
-        printf("thread2: n==========%d\n", n++);
+        printf("thread2: n=========%d\n", n++);
         pthread_mutex_unlock(&mutelock);
     }
 }
@@ -36,6 +36,7 @@ int main(){
     pthread_join(pid1, NULL);
     pthread_join(pid2, NULL);
     printf("n:\t%d\n", n);
-    pthread_attr_destroy(&mutelock);
+    pthread_cond_destroy(&cond);
+    pthread_mutex_destroy(&mutelock);
     return 0;
 }
