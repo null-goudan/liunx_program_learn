@@ -16,3 +16,4 @@ goudan的linux学习库
     - fork_1.c      创建进程: 三种方式： system fork exec族 这里是fork创建子进程
     - fork_work.c   创建父进程和子进程， 父进程负责读取输入并控制子进程，子进程负责输出当前事件
     - daemon.c      创建守护进程
+- 3. pthread: liunx 
